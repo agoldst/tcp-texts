@@ -28,7 +28,8 @@ if __name__ == "__main__":
 
     def proc(fn):
         with codecs.open(fn, "r", encoding="utf-8") as f:
-            print(file2row(f))
+            line = file2row(f)
+            print(line.encode("utf-8"))
 
     for fn in filenames:
         if os.path.isdir(fn):
