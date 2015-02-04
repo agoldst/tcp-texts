@@ -39,7 +39,7 @@ def process_file(f, out):
     try:
         a_str = src.TITLESTMT.AUTHOR.string
         row["author"] = author_dates_pat.sub("", a_str)
-        row["dates"] = author_dates_pat.match(a_str).group(1)
+        row["dates"] = author_dates_pat.search(a_str).group(1)
     except AttributeError:
         pass
 
