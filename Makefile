@@ -8,9 +8,9 @@ ecco_root := ecco-tcp
 ecco_headers := $(ecco_root)/headers.ecco
 
 ecco_hdr:
-	curl -o $(ecco_headers).zip \
-	    http://www.lib.umich.edu/tcp/docs/texts/ecco/headers.ecco.zip
 	mkdir -p $(ecco_headers)
+	curl -Lo $(ecco_headers).zip \
+		http://www.lib.umich.edu/tcp/docs/texts/ecco/headers.ecco.zip
 	unzip -d $(ecco_headers) $(ecco_headers).zip
 
 generated/ecco-headers.csv:
