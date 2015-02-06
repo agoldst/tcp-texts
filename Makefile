@@ -4,8 +4,7 @@
 test:
 	echo "No tests."
 
-ecco_root := ecco-tcp
-ecco_headers := $(ecco_root)/headers.ecco
+ecco_headers := ecco-tcp/headers.ecco
 
 ecco_hdr:
 	mkdir -p $(ecco_headers)
@@ -17,13 +16,13 @@ generated/ecco-headers.csv:
 	mkdir -p generated
 	python tcp_hdr2csv.py -h $(ecco_headers)/* > $@
 
-ecco_xml_zip := xml-200510.ecco.zip xml-200601.ecco.zip xml-200604.ecco.zip xml-200609.ecco.zip xml-200702.ecco.zip xml-200802.ecco.zip xml-200809.ecco.zip xml-200902.ecco.zip xml-200909.ecco.zip xml-201004.ecco.zip xml-201106.ecco.zip
+ecco_xml_zip := ecco-tcp/xml-200510.ecco.zip ecco-tcp/xml-200601.ecco.zip ecco-tcp/xml-200604.ecco.zip ecco-tcp/xml-200609.ecco.zip ecco-tcp/xml-200702.ecco.zip ecco-tcp/xml-200802.ecco.zip ecco-tcp/xml-200809.ecco.zip ecco-tcp/xml-200902.ecco.zip ecco-tcp/xml-200909.ecco.zip ecco-tcp/xml-201004.ecco.zip ecco-tcp/xml-201106.ecco.zip
 
-ecco_xml_dir := $(ecco_root)/xml
+ecco_xml_dir := ecco-tcp/xml
 
-$(ecco_xml_zip): %.zip:
-	curl -o $(ecco_root)/$< \
-	    http://www.lib.umich.edu/tcp/docs/texts/ecco/$< 
+ecco-tcp/%.zip:
+	curl -Lo $@ \
+	    http://www.lib.umich.edu/tcp/docs/texts/ecco/$*
 
 ecco_xml: $(ecco_xml_zip)
 	mkdir -p $(ecco_xml_dir)
