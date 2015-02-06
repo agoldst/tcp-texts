@@ -8,8 +8,8 @@ ecco_root := ecco-tcp
 ecco_headers := $(ecco_root)/headers.ecco
 
 ecco_hdr:
-	curl http://www.lib.umich.edu/tcp/docs/texts/ecco/headers.ecco.zip \
-	    -o $(ecco_headers).zip
+	curl -o $(ecco_headers).zip \
+	    http://www.lib.umich.edu/tcp/docs/texts/ecco/headers.ecco.zip
 	mkdir -p $(ecco_headers)
 	unzip -d $(ecco_headers) $(ecco_headers).zip
 
@@ -22,8 +22,8 @@ ecco_xml_zip := xml-200510.ecco.zip xml-200601.ecco.zip xml-200604.ecco.zip xml-
 ecco_xml_dir := $(ecco_root)/xml
 
 $(ecco_xml_zip): %.zip:
-	curl http://www.lib.umich.edu/tcp/docs/texts/ecco/$< \
-	    -o $(ecco_root)/$<
+	curl -o $(ecco_root)/$< \
+	    http://www.lib.umich.edu/tcp/docs/texts/ecco/$< 
 
 ecco_xml: $(ecco_xml_zip)
 	mkdir -p $(ecco_xml_dir)
