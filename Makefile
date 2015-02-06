@@ -30,7 +30,7 @@ ecco_xml: $(ecco_xml_zip)
 	    unzip -o -d $(ecco_xml_dir) $$z; \
 	    done
 
-generated/ecco-text.tsv:
+generated/ecco-text.tsv: generated/ecco-headers.csv
 	python tcp_xml2tsv.py -h $(ecco_xml_dir) > $@
 
 # eebo tcp material has to be downloaded by hand at https://umich.app.box.com/s/nfdp6hz228qtbl2hwhhb
