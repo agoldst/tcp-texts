@@ -37,6 +37,7 @@ generated/ecco-text.tsv: generated/ecco-headers.csv
 # I have used the P5_snapshot_201501 and headers directories
 
 eebo_root := eebo-tcp1/headers/header_temp
+
 generated/eebo-headers.csv:
 	mkdir -p generated
 	python tcp_hdr2csv.py -h $(eebo_root) > $@
@@ -52,6 +53,38 @@ eebo_xml: $(eebo_xml_zip)
 
 generated/eebo-text.tsv:
 	python tcp_xml2tsv.py -h $(eebo_xml_dir) > $@
+
+
+
+# Bookworm related stuff goes here.
+
+cleanworm:
+	-rm -r tcpworm/files/metadata
+	-rm -r tcpworm/files/targets
+
+tcpworm:
+	git clone git@github.com:Bookworm-Project/BookwormDB $@
+
+tcpworm/files/metadata/jsoncatalog.txt: tcpworm generated/ecco-headers.csv
+	mkdir -p tcpworm/files/metadata
+	mkdir -p tcpworm/files/texts
+	python bookworm_prep/create_catalog.py > $@
+
+tcpworm/files/metadata/field_descriptions.json: field_descriptions.json
+	cp $< $@
+
+bookwormBuilt: tcpworm/files/metadata/jsoncatalog.txt tcpworm/files/metadata/field_descriptions.json
+	cd tcpworm; make textStream="cat ../generated/ecco-text.tsv"
+
+jsoncatalog.txt:
+	python bookworm_prep/create_catalog.py
+
+malletCatalog:
+	mkdir tcpworm/extensions
+	git clone git@github.com:bmschmidt/Bookworm-Mallet tcpworm/extensions/mallet
+	cd tcpworm/extensions/mallet; make
+
+
 
 .DEFAULT_GOAL: test
 
