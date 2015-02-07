@@ -36,10 +36,20 @@ generated/ecco-text.tsv:
 # eebo tcp material has to be downloaded by hand at https://umich.app.box.com/s/nfdp6hz228qtbl2hwhhb
 # I have used the P5_snapshot_201501 and headers directories
 
-eebo_root := eebo-tcp1/headers/header_temp
-generated/eebo-headers.csv:
+eebo_root := eebo-tcp1
+eebo_hdr_dir := $(eebo_root)/headers
+eebo_hdr_extracted := $(eebo_hdr_dir)/header_temp
+
+eebo_hdrs: $(eebo_root)/headers.zip
+	mkdir -p $(eebo_hdr_dir)
+	unzip -o -d $(eebo_root) $(eebo_root)/headers.zip
+	for z in $(eebo_hdr_dir)/*.tgz ; do \
+	    tar -C $(eebo_hdr_dir) -xzvf $$z; \
+	    done
+
+generated/eebo-headers.csv: eebo_hdrs
 	mkdir -p generated
-	python tcp_hdr2csv.py -h $(eebo_root) > $@
+	python tcp_hdr2csv.py -h $(eebo_hdr_extracted) > $@
 
 eebo_xml_zip := $(wildcard eebo-tcp1/P5_snapshot_201501/*.zip)
 eebo_xml_dir := eebo-tcp1/P5_snapshot_201501/xml
@@ -55,4 +65,4 @@ generated/eebo-text.tsv:
 
 .DEFAULT_GOAL: test
 
-.PHONY: ecco_hdr ecco_xml test eebo_xml
+.PHONY: ecco_hdr ecco_xml test eebo_xml eebo_hdrs
