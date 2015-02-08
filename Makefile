@@ -30,17 +30,32 @@ ecco_xml: $(ecco_xml_zip)
 	    unzip -o -d $(ecco_xml_dir) $$z; \
 	    done
 
-generated/ecco-text.tsv: generated/ecco-headers.csv
+generated/ecco-text.tsv:
 	python tcp_xml2tsv.py -h $(ecco_xml_dir) > $@
 
 # eebo tcp material has to be downloaded by hand at https://umich.app.box.com/s/nfdp6hz228qtbl2hwhhb
 # I have used the P5_snapshot_201501 and headers directories
 
-eebo_root := eebo-tcp1/headers/header_temp
+eebo_root := eebo-tcp1
+eebo_hdr_dir := $(eebo_root)/headers
+eebo_hdr_extracted := $(eebo_hdr_dir)/header_temp
 
-generated/eebo-headers.csv:
+
+#Mine came already zipped, somehow
+#The target here is hardcoded b/c you can't do a $(eebo_root) function in a target, right?
+
+eebo-tcp1/headers:
+	mkdir -p $(eebo_hdr_dir)
+	unzip -o -d $(eebo_root) $(eebo_root)/headers.zip
+
+eebo_hdrs: $(eebo_hdr_dir)
+	for z in $(eebo_hdr_dir)/*.tgz ; do \
+	    tar -C $(eebo_hdr_dir) -xzvf $$z; \
+	    done
+
+generated/eebo-headers.csv: eebo_hdrs
 	mkdir -p generated
-	python tcp_hdr2csv.py -h $(eebo_root) > $@
+	python tcp_hdr2csv.py -h $(eebo_hdr_extracted) > $@
 
 eebo_xml_zip := $(wildcard eebo-tcp1/P5_snapshot_201501/*.zip)
 eebo_xml_dir := eebo-tcp1/P5_snapshot_201501/xml
@@ -74,10 +89,10 @@ tcpworm/files/metadata/field_descriptions.json: field_descriptions.json
 	cp $< $@
 
 bookwormBuilt: tcpworm/files/metadata/jsoncatalog.txt tcpworm/files/metadata/field_descriptions.json
-	cd tcpworm; make textStream="cat ../generated/ecco-text.tsv"
+	cd tcpworm; make textStream="cat ../generated/ecco-text.tsv ../generated/eebo-text.tsv"
 
 jsoncatalog.txt:
-	python bookworm_prep/create_catalog.py
+	python bookworm_prep/create_catalog.py > $@
 
 malletCatalog:
 	mkdir tcpworm/extensions
@@ -88,4 +103,4 @@ malletCatalog:
 
 .DEFAULT_GOAL: test
 
-.PHONY: ecco_hdr ecco_xml test eebo_xml
+.PHONY: ecco_hdr ecco_xml test eebo_xml eebo_hdrs
