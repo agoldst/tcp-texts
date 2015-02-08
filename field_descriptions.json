@@ -1,0 +1,10 @@
+[
+    {"field":"title","datatype":"etc","type":"text","unique":true},
+    {"field":"source","datatype":"categorical","type":"character","unique":true},
+    {"field":"pubplace","datatype":"categorical","type":"character","unique":true},
+    {"field":"author","datatype":"categorical","type":"character","unique":true},
+    {"field":"date","datatype":"time","type":"character","unique":true,"derived":[
+        {"resolution":"year"}
+    ]},
+    {"field":"searchstring","datatype":"searchstring","type":"text","unique":true}
+]
