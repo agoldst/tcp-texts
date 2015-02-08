@@ -40,9 +40,15 @@ eebo_root := eebo-tcp1
 eebo_hdr_dir := $(eebo_root)/headers
 eebo_hdr_extracted := $(eebo_hdr_dir)/header_temp
 
-eebo_hdrs: $(eebo_root)/headers.zip
+
+#Mine came already zipped, somehow
+#The target here is hardcoded b/c you can't do a $(eebo_root) function in a target, right?
+
+eebo-tcp1/headers:
 	mkdir -p $(eebo_hdr_dir)
 	unzip -o -d $(eebo_root) $(eebo_root)/headers.zip
+
+eebo_hdrs: $(eebo_hdr_dir)
 	for z in $(eebo_hdr_dir)/*.tgz ; do \
 	    tar -C $(eebo_hdr_dir) -xzvf $$z; \
 	    done
@@ -62,6 +68,38 @@ eebo_xml: $(eebo_xml_zip)
 
 generated/eebo-text.tsv:
 	python tcp_xml2tsv.py -h $(eebo_xml_dir) > $@
+
+
+
+# Bookworm related stuff goes here.
+
+cleanworm:
+	-rm -r tcpworm/files/metadata
+	-rm -r tcpworm/files/targets
+
+tcpworm:
+	git clone git@github.com:Bookworm-Project/BookwormDB $@
+
+tcpworm/files/metadata/jsoncatalog.txt: tcpworm generated/ecco-headers.csv
+	mkdir -p tcpworm/files/metadata
+	mkdir -p tcpworm/files/texts
+	python bookworm_prep/create_catalog.py > $@
+
+tcpworm/files/metadata/field_descriptions.json: field_descriptions.json
+	cp $< $@
+
+bookwormBuilt: tcpworm/files/metadata/jsoncatalog.txt tcpworm/files/metadata/field_descriptions.json
+	cd tcpworm; make textStream="cat ../generated/ecco-text.tsv ../generated/eebo-text.tsv"
+
+jsoncatalog.txt:
+	python bookworm_prep/create_catalog.py > $@
+
+malletCatalog:
+	mkdir tcpworm/extensions
+	git clone git@github.com:bmschmidt/Bookworm-Mallet tcpworm/extensions/mallet
+	cd tcpworm/extensions/mallet; make
+
+
 
 .DEFAULT_GOAL: test
 
